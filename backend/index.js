@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const app = express();
 const todoRouter = require("./routes/todo");
-const port=process.env.PORT;
+const port=Math.floor((process.env.PORT).toString());
 app.use(bodyParser.json());
 app.use("/todo", todoRouter);
 

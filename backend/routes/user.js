@@ -66,7 +66,7 @@ router.get("/todos",validateTokenMiddleware,async (req,res)=>{
 });
 
 //route to update the status of a todo
-router.get("/marktodo/:id",validateTokenMiddleware, async (req,res)=>{
+router.put("/marktodo/:id",validateTokenMiddleware, async (req,res)=>{
     //check if course id user is trying to validate is present in his todos array if yes than change the status of the that todo to opposite of whats there
     const token=req.headers["authorization"];
     const uname=jwt.decode(token).uname;
@@ -87,6 +87,44 @@ router.get("/marktodo/:id",validateTokenMiddleware, async (req,res)=>{
     }else{
         res.status(404).json({msg:"Todo not found"});
     }
-})
+});
+
+//route to delete a todo
+router.delete("/deletetodo/:id", validateTokenMiddleware, async (req, res) => {
+    try {
+        const token = req.headers["authorization"];
+        const uname = jwt.decode(token).uname;
+
+        // Fetch the user
+        const user = await User.findOne({ uname: uname });
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        // Fetch the todo
+        const todo = await Todo.findOne({ id: req.params.id });
+        if (!todo) {
+            return res.status(404).json({ msg: "Todo not found" });
+        }
+
+        // Check if the todo belongs to the user
+        if (user.todos.includes(todo.id)) {
+            // Update user's todo array to remove the todo id being deleted
+            user.todos = user.todos.filter((id) => id !== todo.id);
+            await user.save();
+
+            // Delete the todo using deleteOne
+            await Todo.deleteOne({ id: req.params.id });
+            return res.status(200).json({ msg: "Todo deleted successfully" });
+        } else {
+            return res.status(401).json({ msg: "Unauthorized, todo id does not belong to user" });
+        }
+    } catch (err) {
+        console.error("Error deleting todo:", err); // Log the error for debugging
+        return res.status(500).json({ msg: "Internal server error" });
+    }
+});
+
+
 
 module.exports=router;

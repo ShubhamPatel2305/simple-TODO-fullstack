@@ -23,6 +23,29 @@ const TodoSchema=mongoose.Schema({
     }
 });
 
+const UserSchema=mongoose.Schema({
+    uname:{
+        type:String,
+        required:true,
+        minlength:3,
+        maxlength:255,
+        unique:true
+    },
+    pass:{
+        type:String,
+        required:true,
+        minlength:7,
+        maxlength:255
+    },
+    todos:[
+        {
+            type:number,
+            ref:'todos',
+            required:true
+        }
+    ]
+})
+
 // add an id as autoincrement starting from 1 
 TodoSchema.plugin(autoincrement, {
     id: 'todo_counter',
@@ -31,5 +54,6 @@ TodoSchema.plugin(autoincrement, {
 });
 
 const Todo=mongoose.model('todos', TodoSchema);
+const User=mongoose.model('users', UserSchema);
 
-module.exports=Todo;
+module.exports={Todo, User};

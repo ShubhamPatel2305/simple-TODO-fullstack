@@ -1,5 +1,6 @@
 const mongoose=require('mongoose');
-const autoincrement=require('mongoose-sequence');
+const autoincrement = require('mongoose-sequence')(mongoose); // Pass mongoose as an argument
+
 require('dotenv').config({path:'../.env'});
 
 const uri=(process.env.MONGO_URI).toString();
@@ -39,7 +40,7 @@ const UserSchema=mongoose.Schema({
     },
     todos:[
         {
-            type:number,
+            type:Number,
             ref:'todos',
             required:true
         }
